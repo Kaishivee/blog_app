@@ -1,0 +1,36 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Регистрация</title>
+    <link rel="stylesheet" type="text/css" href="/static/style.css">
+</head>
+<body>
+<div class="container">
+    <form action="/user/create" method="post">
+        <div class="title">Регистрация</div>
+
+        <!-- Блок для отображения ошибок -->
+        {% if error %}
+            <div class="error">{{ error }}</div>
+        {% endif %}
+
+        <div class="input-box underline">
+            <input type="text" name="email" placeholder="Введите ваш Email" required>
+            <div class="underline"></div>
+        </div>
+
+        <div class="input-box">
+            <input type="password" name="password" placeholder="Введите ваш Пароль" required>
+            <div class="underline"></div>
+        </div>
+
+        <div class="input-box button">
+            <input type="submit" value="Зарегистрироваться">
+        </div>
+    </form>
+
+    <div class="option">Уже есть аккаунт? <a href="/user/login">Войти</a></div>
+</div>
+</body>
+</html>
