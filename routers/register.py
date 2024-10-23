@@ -1,12 +1,11 @@
 from fastapi import APIRouter, Depends, status, HTTPException, Path, Form, Request
 from sqlalchemy.orm import Session
 from typing import Annotated
-from sqlalchemy import insert, select, delete
+from sqlalchemy import select
 from fastapi.templating import Jinja2Templates
 from database import get_db
 from models.post_user_model import User
-from schemas import CreateUser
-
+from passlib.context import CryptContext
 from fastapi.responses import RedirectResponse, HTMLResponse
 
 templates = Jinja2Templates(directory="templates")
@@ -17,6 +16,8 @@ router = APIRouter(
     responses={404: {"description": "Not found"}},
 )
 
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
 
 @router.get("/login", response_class=HTMLResponse)
 async def login_page(request: Request):
@@ -26,14 +27,17 @@ async def login_page(request: Request):
 @router.post("/login")
 async def login(
         request: Request,
-        email: str = Form(...),
+        username: str = Form(...),
         password: str = Form(...),
-        db: Session = Depends(get_db)
+        db: Session = Depends(get_db),
 ):
-    user = db.query(User).filter(User.email == email).first()
-    if not user or user.password != password:  # In a real app, use secure password comparison
+    user = db.query(User).filter(User.username == username).first()
+    if not user or not pwd_context.verify(password, user.hashed_password):
         return templates.TemplateResponse("login.html", {"request": request, "error": "Invalid credentials"})
-    return RedirectResponse(url="/my_blog", status_code=302)
+
+    response = RedirectResponse(url="/my_blog", status_code=status.HTTP_302_FOUND)
+    response.set_cookie(key="user_id", value=str(user.id), httponly=True)
+    return response
 
 
 @router.get("/register", response_class=HTMLResponse)
@@ -45,21 +49,23 @@ async def register_page(request: Request):
 async def create_user(
         request: Request,
         db: Session = Depends(get_db),
+        username: str = Form(...),
         email: str = Form(...),
-        password: str = Form(...)
+        password: str = Form(...),
 ):
-    # Check if the user already exists
     db_user = db.query(User).filter(User.email == email).first()
     if db_user:
         return templates.TemplateResponse("main_page.html", {"request": request, "error": "Email already registered"})
 
-    # Create a new user
-    new_user = User(email=email, password=password)
+    db_username = db.query(User).filter(User.username == username).first()
+    if db_username:
+        return templates.TemplateResponse("main_page.html", {"request": request, "error": "Username already taken"})
+
+    hashed_password = pwd_context.hash(password)
+    new_user = User(username=username, email=email, hashed_password=hashed_password)
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
-
-    # Redirect to login page after registration
     return RedirectResponse(url="/user/login", status_code=302)
 
 
@@ -68,13 +74,9 @@ async def delete_user(
         user_id: int = Path(..., title="The ID of the user to delete"),
         db: Session = Depends(get_db)
 ):
-    # Fetch the user from the database
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
-
-    # Delete the user
     db.delete(user)
     db.commit()
-
     return {"detail": "User deleted successfully"}

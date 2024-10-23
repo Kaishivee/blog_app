@@ -23,15 +23,22 @@
                 </form>
             </div>
 
+            <!-- Блок для отображения сообщения об ошибке -->
+            {% if error_message %}
+                <div class="error-message">{{ error_message }}</div>
+            {% endif %}
+
             <div class="posts">
                 <h2>Посты</h2>
                 {% for post in posts %}
                 <div class="post" data-post-id="{{ post.id }}">
-                    <p>{{ post.content }}</p>
-                    <button class="edit-btn" onclick="window.location.href='/posts/{{ post.id }}/edit'">Редактировать</button>
-                    <form action="/posts/{{ post.id }}/delete" method="post">
-                        <button class="delete-btn" type="submit">Удалить</button>
-                    </form>
+                    <p><strong>{{ post.user.username }}</strong>: {{ post.content }}</p>
+                    {% if post.user_id == user_id %}
+                        <button class="edit-btn" onclick="window.location.href='/posts/{{ post.id }}/edit'">Редактировать</button>
+                        <form action="/posts/{{ post.id }}/delete" method="post">
+                            <button class="delete-btn" type="submit">Удалить</button>
+                        </form>
+                    {% endif %}
                 </div>
                 {% endfor %}
             </div>
