@@ -6,6 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="fda69b6a-4221-4bf9-a4f8-c8f3862879df" name="Changes" comment="first_commit">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/my_app_blog.db" beforeDir="false" afterPath="$PROJECT_DIR$/my_app_blog.db" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/edit_post.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/edit_post.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
