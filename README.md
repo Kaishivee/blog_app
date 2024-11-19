@@ -25,7 +25,7 @@
 1. **Клонируйте репозиторий с помощью Git**:
 
    ```bash
-   git clone https://github.com/ваш_логин/chat-app.git
+   git clone https://github.com/Kaishivee/blog_app.git
    ```
 
 2. **Создайте и активируйте виртуальное окружение**:
